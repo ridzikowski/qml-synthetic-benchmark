@@ -11,7 +11,8 @@ def load_dataset(
     n_samples: int = 1000,
     n_classes: int = 2,
     n_features: int = 4,
-    n_clusters_per_class: int = 1,
+    complexity: str = "medium",  # "easy", "medium", "complex", "very_complex"
+    use_projection_matrix: bool = False,  # Applies EPCO-style linear projection
     random_state: int = 42,
 ):
     name_clean = dataset_name.lower().strip().replace(" ", "_").replace("-", "_")
@@ -34,15 +35,37 @@ def load_dataset(
         X_raw = df.iloc[:, :-1].values.astype(float)
         y_raw = df.iloc[:, -1].values
 
-    elif any(
-        k in name_clean
-        for k in ["synthetic", "generated", "make_classification", "synthetic_classification"]
-    ):
-        # Calculate n_informative so 2**n_informative >= n_classes * n_clusters_per_class
-        required_informative = int(np.ceil(np.log2(n_classes * n_clusters_per_class)))
-        n_informative = max(2, required_informative)
+    elif "synthetic" in name_clean:
+        # 1. Map requested complexity levels to make_classification hyperparameters
+        complexity_presets = {
+            "easy": {
+                "class_sep": 1.8,
+                "flip_y": 0.0,
+                "n_clusters_per_class": 1,
+            },
+            "medium": {
+                "class_sep": 1.0,
+                "flip_y": 0.01,
+                "n_clusters_per_class": 1,
+            },
+            "complex": {
+                "class_sep": 0.6,
+                "flip_y": 0.05,
+                "n_clusters_per_class": 1,
+            },
+            "very_complex": {
+                "class_sep": 0.3,
+                "flip_y": 0.10,
+                "n_clusters_per_class": 2,
+            },
+        }
 
-        # Ensure n_features is large enough for requested indices and informative features
+        params = complexity_presets.get(complexity.lower(), complexity_presets["medium"])
+        n_clusters = params["n_clusters_per_class"]
+
+        # Ensure 2**n_informative >= n_classes * n_clusters_per_class
+        required_informative = int(np.ceil(np.log2(n_classes * n_clusters)))
+        n_informative = max(2, required_informative)
         effective_n_features = max(n_features, max(target_features_int) + 1, n_informative)
 
         X_raw, y_raw = make_classification(
@@ -51,13 +74,23 @@ def load_dataset(
             n_classes=n_classes,
             n_informative=n_informative,
             n_redundant=0,
-            n_clusters_per_class=n_clusters_per_class,
+            n_clusters_per_class=n_clusters,
+            class_sep=params["class_sep"],
+            flip_y=params["flip_y"],
             random_state=random_state,
         )
 
+        # 2. EPCO Concept: Apply linear projection matrix transformation X' = X @ P
+        if use_projection_matrix:
+            np.random.seed(random_state)
+            # Draw random d x d transformation matrix P ~ N(0, 3) as described in EPCO
+            d = X_raw.shape[1]
+            projection_matrix = np.random.normal(loc=0.0, scale=3.0, size=(d, d))
+            X_raw = X_raw @ projection_matrix
+
     else:
         raise ValueError(
-            f"Nieznany dataset: '{dataset_name}'. Wybierz 'iris', 'coronus f4', 'coronus 5f' lub 'synthetic'."
+            f"Nieznany dataset: '{dataset_name}'. Wybierz 'iris', 'cornus f4', 'cornus 5f' lub 'synthetic'."
         )
 
     # Bezpieczna filtracja klas niezależnie od typu (int vs str)

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import load_iris, make_classification
 from sklearn.preprocessing import MinMaxScaler
-
+from sklearn.model_selection import StratifiedKFold
 
 def load_dataset(
     dataset_name: str = "iris",
@@ -104,8 +104,22 @@ def load_dataset(
     # Wybór cech
     X_selected = X_filtered[:, target_features_int]
 
-    # Normalizacja do zakresu [0, 1]
-    scaler = MinMaxScaler()
-    X_normalized = scaler.fit_transform(X_selected)
+    return X_selected, y_filtered
 
-    return X_normalized, y_filtered
+def stratified_kfold(X, y, seed=42, n_splits=5):
+    skf = StratifiedKFold(
+        n_splits=n_splits,
+        shuffle=True,
+        random_state=seed
+    )
+
+    for train_idx, test_idx in skf.split(X, y):
+        X_train = X[train_idx]
+        X_test = X[test_idx]
+        y_train = y[train_idx]
+        y_test = y[test_idx]
+        scaler = MinMaxScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+
+        yield X_train, X_test, y_train, y_test

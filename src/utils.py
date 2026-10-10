@@ -21,14 +21,14 @@ def make_and_save_synthetic(
             "n_clusters_per_class": 1,
         },
         "medium": {
-            "class_sep": 1.0,
-            "flip_y": 0.01,
-            "n_clusters_per_class": 1,
-        },
-        "complex": {
             "class_sep": 0.6,
             "flip_y": 0.05,
             "n_clusters_per_class": 1,
+        },
+        "complex": {
+            "class_sep": 0.3,
+            "flip_y": 0.1,
+            "n_clusters_per_class": 2,
         }
             # "very_complex": {
             #     "class_sep": 0.3,
@@ -116,32 +116,13 @@ def load_dataset(
 
     elif "synthetic" in name_clean:
         if "easy" in name_clean:
-            if "3" in name_clean or "three" in name_clean:
-                file_path = "datasets/easy_synthetic_three_features.csv"
-            elif "4" in name_clean or "four" in name_clean:
-                file_path = "datasets/easy_synthetic_four_features.csv"
-            elif "5" in name_clean or "five" in name_clean:
-                file_path = "datasets/easy_synthetic_five_features.csv"
-            else:
-                raise ValueError(f"Nieokreślony wariant Synthetic w nazwie: {dataset_name}")
+            file_path = "datasets/easy_synthetic.csv"
+            
         elif "medium" in name_clean:
-            if "3" in name_clean or "three" in name_clean:
-                file_path = "datasets/medium_synthetic_three_features.csv"
-            elif "4" in name_clean or "four" in name_clean:
-                file_path = "datasets/medium_synthetic_four_features.csv"
-            elif "5" in name_clean or "five" in name_clean:
-                file_path = "datasets/medium_synthetic_five_features.csv"
-            else:
-                raise ValueError(f"Nieokreślony wariant Synthetic w nazwie: {dataset_name}")
+            file_path = "datasets/medium_synthetic.csv"
+            
         elif "complex" in name_clean:
-            if "3" in name_clean or "three" in name_clean:
-                file_path = "datasets/complex_synthetic_three_features.csv"
-            elif "4" in name_clean or "four" in name_clean:
-                file_path = "datasets/complex_synthetic_four_features.csv"
-            elif "5" in name_clean or "five" in name_clean:
-                file_path = "datasets/complex_synthetic_five_features.csv"
-            else:
-                raise ValueError(f"Nieokreślony wariant Synthetic w nazwie: {dataset_name}")
+            file_path = "datasets/complex_synthetic.csv"
         else:
             raise ValueError(f"Nieokreślony wariant Synthetic w nazwie: {dataset_name}")
 
@@ -185,3 +166,5 @@ def stratified_kfold(X, y, seed=42, n_splits=5):
         X_test = scaler.transform(X_test)
 
         yield X_train, X_test, y_train, y_test
+
+

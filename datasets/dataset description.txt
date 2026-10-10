@@ -1,0 +1,24 @@
+One way Anova test was used in order to find the most important features in every dataset.
+Test results are described by F-statistic and p-value. The higher the F-statistic, the more important the feature is. The lower the p-value, the more significant the feature is.
+Order of the features is based on the F-statistic value. The features with the highest F-statistic are considered the most important.
+
+**Easy dataset**
+feature_4: F-stat = 1115.7809, p-value = 0.0000e+00
+feature_2: F-stat = 1002.2288, p-value = 0.0000e+00
+feature_3: F-stat = 966.7490, p-value = 0.0000e+00
+feature_0: F-stat = 876.8177, p-value = 0.0000e+00
+feature_1: F-stat = 647.4986, p-value = 0.0000e+00
+
+**Medium dataset**
+feature_0: F-stat = 326.9684, p-value = 2.0242e-226
+feature_4: F-stat = 295.9580, p-value = 1.7435e-208
+feature_3: F-stat = 286.4368, p-value = 7.3967e-203
+feature_1: F-stat = 259.1430, p-value = 2.1471e-186
+feature_2: F-stat = 192.0816, p-value = 1.0730e-143
+
+**Complex dataset**
+feature_2: F-stat = 116.5378, p-value = 3.1387e-91
+feature_0: F-stat = 102.6567, p-value = 5.0687e-81
+feature_4: F-stat = 91.5075, p-value = 1.1002e-72
+feature_3: F-stat = 91.3080, p-value = 1.5551e-72
+feature_1: F-stat = 60.1960, p-value = 1.3533e-48

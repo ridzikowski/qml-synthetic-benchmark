@@ -188,10 +188,7 @@ if __name__ == "__main__":
 
     # Test 2: Synthetic Dataset generated on-the-fly
     run_analysis_and_visualization(
-        dataset_name="synthetic",
-        target_classes=["0", "1"],
-        target_features=[0, 1, 2, 3],
-        n_samples=600,
-        n_classes=2,
-        n_features=5,
+        dataset_name="1_complex_synthetic",
+        target_features=[0, 1, 2, 3, 4],
+        target_classes=["0", "1", "2", "3", "4"]
     )

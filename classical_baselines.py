@@ -126,7 +126,7 @@ def calculate_means():
     metric = "Accuracy"
     results = []
 
-    for file in sorted(folder.glob("*_classical_baselines_results_*.csv")):
+    for file in sorted(folder.glob("classical_baselines_results_*.csv")):
         df = pd.read_csv(file)
 
         mean_score = df.groupby("Model")[metric].mean().mean()
@@ -166,75 +166,53 @@ def calculate_means():
     plt.savefig("mean_accuracy.png", dpi=300)
     plt.show()
 
-if __name__ == "__main__":
-    calculate_means()
 
-# if __name__ == "__main__":
-#     verbose = False
-#     easy_3_features = {
-#         "dataset_name": "easy_synthetic_three_features",
-#         "target_features": [0, 1, 2],
-#     }
-#     easy_4_features = {
-#         "dataset_name": "easy_synthetic_four_features",
-#         "target_features": [0, 1, 2, 3],
-#     }
-#     easy_5_features = {
-#         "dataset_name": "easy_synthetic_five_features",
-#         "target_features": [0, 1, 2, 3, 4],
-#     }
-#     medium_3_features = {
-#         "dataset_name": "medium_synthetic_three_features",
-#         "target_features": [0, 1, 2],
-#     }
-#     medium_4_features = {
-#         "dataset_name": "medium_synthetic_four_features",
-#         "target_features": [0, 1, 2, 3],
-#     }
-#     medium_5_features = {
-#         "dataset_name": "medium_synthetic_five_features",
-#         "target_features": [0, 1, 2, 3, 4],
-#     }
-#     hard_3_features = {
-#         "dataset_name": "complex_synthetic_three_features",
-#         "target_features": [0, 1, 2],
-#     }
-#     hard_4_features = {
-#         "dataset_name": "complex_synthetic_four_features",
-#         "target_features": [0, 1, 2, 3],
-#     }
-#     hard_5_features = {
-#         "dataset_name": "complex_synthetic_five_features",
-#         "target_features": [0, 1, 2, 3, 4],
-#     }
-#     test_objects = [easy_3_features, easy_4_features, easy_5_features,
-#                     medium_3_features, medium_4_features, medium_5_features,
-#                     hard_3_features, hard_4_features, hard_5_features]
-#     for test_object in test_objects:
-#         start_time = time.time()
-#         output_file = f'results/classical_baselines_results_{test_object["dataset_name"]}.csv'
-#         if output_file:
-#             with open(output_file, 'w') as f:
-#                 f.write("Model,Accuracy,Macro-F1,Macro-Prec,Macro-Recall\n")
-#         X, y = load_dataset(
-#             dataset_name=test_object["dataset_name"],
-#             target_features=test_object["target_features"],
-#         )
-#
-#         if X is not None:
-#             seeds = [10, 25, 42, 55, 73, 88, 99, 101, 202, 303]
-#             all_rf_acc = []
-#
-#             for seed in seeds:
-#                 if verbose:
-#                     print(f"Seed: {seed}")
-#                 evaluate_classical_models(X, y, n_splits=5, random_state=seed, output_file=output_file, verbose=verbose)
-#
-#
-#         results = calculate_average_metrics(output_file)
-#         end_time = time.time()-start_time
-#         print(f"\n--- AVERAGE METRICS OVER ALL SEEDS FOR {test_object["dataset_name"]}, ELAPSED TIME {end_time:.2f} s ---")
-#         print(results)
-#
-#     # create_latex_table(results, output_file='results/classical_baselines_results_avg_3vs4_5_features.tex')
+
+if __name__ == "__main__":
+    verbose = False
+    easy = {
+        "dataset_name": "1_easy_synthetic",
+        "target_features": [0, 1, 2, 3 ,4],
+        "target_classes" : ["0", "1", "2", "3", "4"]
+
+    }
+    medium = {
+        "dataset_name": "2_medium_synthetic",
+        "target_features": [0, 1, 2, 3,4],
+        "target_classes" : ["0", "1", "2", "3", "4"]
+    }
+    complex= {
+        "dataset_name": "3_complex_synthetic",
+        "target_features": [0, 1, 2, 3, 4],
+        "target_classes" : ["0", "1", "2", "3", "4"]
+    }
+    test_objects = [easy,medium,complex]
+    for test_object in test_objects:
+        start_time = time.time()
+        output_file = f'results/classical_baselines_results_{test_object["dataset_name"]}.csv'
+        if output_file:
+            with open(output_file, 'w') as f:
+                f.write("Model,Accuracy,Macro-F1,Macro-Prec,Macro-Recall\n")
+        X, y = load_dataset(
+            dataset_name=test_object["dataset_name"],
+            target_features=test_object["target_features"],
+            target_classes=test_object["target_classes"],
+        )
+
+        if X is not None:
+            seeds = [10, 25, 42, 55, 73, 88, 99, 101, 202, 303]
+            all_rf_acc = []
+
+            for seed in seeds:
+                if verbose:
+                    print(f"Seed: {seed}")
+                evaluate_classical_models(X, y, n_splits=5, random_state=seed, output_file=output_file, verbose=verbose)
+
+
+        results = calculate_average_metrics(output_file)
+        end_time = time.time()-start_time
+        print(f"\n--- AVERAGE METRICS OVER ALL SEEDS FOR {test_object["dataset_name"]}, ELAPSED TIME {end_time:.2f} s ---")
+        print(results)
+    calculate_means()
+    # create_latex_table(results, output_file='results/classical_baselines_results_avg_3vs4_5_features.tex')
 

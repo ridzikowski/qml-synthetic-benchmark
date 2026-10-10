@@ -117,29 +117,29 @@ def load_dataset(
     elif "synthetic" in name_clean:
         if "easy" in name_clean:
             if "3" in name_clean or "three" in name_clean:
-                file_path = "datasets/synthetic_easy_three_features.csv"
+                file_path = "datasets/easy_synthetic_three_features.csv"
             elif "4" in name_clean or "four" in name_clean:
-                file_path = "datasets/synthetic_easy_four_features.csv"
+                file_path = "datasets/easy_synthetic_four_features.csv"
             elif "5" in name_clean or "five" in name_clean:
-                file_path = "datasets/synthetic_easy_five_features.csv"
+                file_path = "datasets/easy_synthetic_five_features.csv"
             else:
                 raise ValueError(f"Nieokreślony wariant Synthetic w nazwie: {dataset_name}")
         elif "medium" in name_clean:
             if "3" in name_clean or "three" in name_clean:
-                file_path = "datasets/synthetic_medium_three_features.csv"
+                file_path = "datasets/medium_synthetic_three_features.csv"
             elif "4" in name_clean or "four" in name_clean:
-                file_path = "datasets/synthetic_medium_four_features.csv"
+                file_path = "datasets/medium_synthetic_four_features.csv"
             elif "5" in name_clean or "five" in name_clean:
-                file_path = "datasets/synthetic_medium_five_features.csv"
+                file_path = "datasets/medium_synthetic_five_features.csv"
             else:
                 raise ValueError(f"Nieokreślony wariant Synthetic w nazwie: {dataset_name}")
         elif "complex" in name_clean:
             if "3" in name_clean or "three" in name_clean:
-                file_path = "datasets/synthetic_complex_three_features.csv"
+                file_path = "datasets/complex_synthetic_three_features.csv"
             elif "4" in name_clean or "four" in name_clean:
-                file_path = "datasets/synthetic_complex_four_features.csv"
+                file_path = "datasets/complex_synthetic_four_features.csv"
             elif "5" in name_clean or "five" in name_clean:
-                file_path = "datasets/synthetic_complex_five_features.csv"
+                file_path = "datasets/complex_synthetic_five_features.csv"
             else:
                 raise ValueError(f"Nieokreślony wariant Synthetic w nazwie: {dataset_name}")
         else:

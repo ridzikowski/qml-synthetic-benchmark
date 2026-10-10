@@ -1,13 +1,23 @@
+import os.path
+
 import pandas as pd
 import warnings
 from src.utils import load_dataset, stratified_kfold
 import numpy as np
+import time
 
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from pathlib import Path
+import pandas as pd
+
+import matplotlib
+matplotlib.use('Agg')
+
+import matplotlib.pyplot as plt
 
 warnings.filterwarnings('ignore')
 
@@ -111,42 +121,120 @@ def create_latex_table(results, output_file='results/classical_baselines_results
         f.write("}\n")
         f.write("\\end{table*}\n")
 
+def calculate_means():
+    folder = Path("results")
+    metric = "Accuracy"
+    results = []
 
-if __name__ == "__main__":
-    verbose = False
-    test_1 = {
-        "dataset_name": "cornus5f",
-        "target_features": [0, 1, 2, 3, 4],
-    }
-    test_2 = {
-        "dataset_name": "cornus4f",
-        "target_features": [0, 1, 2, 3],
-    }
-    test_objects = [test_1, test_2]
-    for test_object in test_objects:
-        output_file = f'results/classical_baselines_results_{test_object["dataset_name"]}.csv'
-        if output_file:
-            with open(output_file, 'w') as f:
-                f.write("Model,Accuracy,Macro-F1,Macro-Prec,Macro-Recall\n")
+    for file in sorted(folder.glob("*_classical_baselines_results_*.csv")):
+        df = pd.read_csv(file)
 
-        X, y = load_dataset(
-            dataset_name=test_object["dataset_name"],
-            target_features=test_object["target_features"],
+        mean_score = df.groupby("Model")[metric].mean().mean()
+
+        name = file.stem.replace(
+            "classical_baselines_results_", ""
         )
 
-        if X is not None:
-            seeds = [10, 25, 42, 55, 73, 88, 99, 101, 202, 303]
-            all_rf_acc = []
+        results.append({
+            "Dataset": name,
+            "Mean": mean_score
+        })
 
-            for seed in seeds:
-                if verbose:
-                    print(f"Seed: {seed}")
-                evaluate_classical_models(X, y, n_splits=5, random_state=seed, output_file=output_file, verbose=verbose)
+    summary = pd.DataFrame(results)
 
+    plt.figure(figsize=(12, 7))
 
-        results = calculate_average_metrics(output_file)
-        print(f"\n--- AVERAGE METRICS OVER ALL SEEDS FOR {test_object["dataset_name"]} ---")
-        print(results)
+    bars = plt.barh(
+        summary["Dataset"],
+        summary["Mean"]
+    )
 
-    # create_latex_table(results, output_file='results/classical_baselines_results_avg_3vs4_5_features.tex')
+    plt.bar_label(
+        bars,
+        labels=[f"{v:.2%}" for v in summary["Mean"]],
+        padding=5
+    )
+
+    plt.xlim(0, 1.10)
+    plt.xlabel("Mean Accuracy")
+    plt.ylabel("Dataset")
+    plt.title("Mean Classification Accuracy by Dataset")
+    plt.gca().invert_yaxis()
+
+    plt.grid(axis="x", alpha=0.2)
+    plt.tight_layout()
+    plt.savefig("mean_accuracy.png", dpi=300)
+    plt.show()
+
+if __name__ == "__main__":
+    calculate_means()
+
+# if __name__ == "__main__":
+#     verbose = False
+#     easy_3_features = {
+#         "dataset_name": "easy_synthetic_three_features",
+#         "target_features": [0, 1, 2],
+#     }
+#     easy_4_features = {
+#         "dataset_name": "easy_synthetic_four_features",
+#         "target_features": [0, 1, 2, 3],
+#     }
+#     easy_5_features = {
+#         "dataset_name": "easy_synthetic_five_features",
+#         "target_features": [0, 1, 2, 3, 4],
+#     }
+#     medium_3_features = {
+#         "dataset_name": "medium_synthetic_three_features",
+#         "target_features": [0, 1, 2],
+#     }
+#     medium_4_features = {
+#         "dataset_name": "medium_synthetic_four_features",
+#         "target_features": [0, 1, 2, 3],
+#     }
+#     medium_5_features = {
+#         "dataset_name": "medium_synthetic_five_features",
+#         "target_features": [0, 1, 2, 3, 4],
+#     }
+#     hard_3_features = {
+#         "dataset_name": "complex_synthetic_three_features",
+#         "target_features": [0, 1, 2],
+#     }
+#     hard_4_features = {
+#         "dataset_name": "complex_synthetic_four_features",
+#         "target_features": [0, 1, 2, 3],
+#     }
+#     hard_5_features = {
+#         "dataset_name": "complex_synthetic_five_features",
+#         "target_features": [0, 1, 2, 3, 4],
+#     }
+#     test_objects = [easy_3_features, easy_4_features, easy_5_features,
+#                     medium_3_features, medium_4_features, medium_5_features,
+#                     hard_3_features, hard_4_features, hard_5_features]
+#     for test_object in test_objects:
+#         start_time = time.time()
+#         output_file = f'results/classical_baselines_results_{test_object["dataset_name"]}.csv'
+#         if output_file:
+#             with open(output_file, 'w') as f:
+#                 f.write("Model,Accuracy,Macro-F1,Macro-Prec,Macro-Recall\n")
+#         X, y = load_dataset(
+#             dataset_name=test_object["dataset_name"],
+#             target_features=test_object["target_features"],
+#         )
+#
+#         if X is not None:
+#             seeds = [10, 25, 42, 55, 73, 88, 99, 101, 202, 303]
+#             all_rf_acc = []
+#
+#             for seed in seeds:
+#                 if verbose:
+#                     print(f"Seed: {seed}")
+#                 evaluate_classical_models(X, y, n_splits=5, random_state=seed, output_file=output_file, verbose=verbose)
+#
+#
+#         results = calculate_average_metrics(output_file)
+#         end_time = time.time()-start_time
+#         print(f"\n--- AVERAGE METRICS OVER ALL SEEDS FOR {test_object["dataset_name"]}, ELAPSED TIME {end_time:.2f} s ---")
+#         print(results)
+#
+#     # create_latex_table(results, output_file='results/classical_baselines_results_avg_3vs4_5_features.tex')
 

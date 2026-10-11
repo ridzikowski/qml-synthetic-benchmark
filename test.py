@@ -121,10 +121,11 @@ def create_latex_table(results, output_file='results/classical_baselines_results
         f.write("}\n")
         f.write("\\end{table*}\n")
 
-def calculate_means(filename = "means.csv", subfolder = None):
+def calculate_means(filename="means.png", subfolder=None):
     folder = Path("results")
     if subfolder is not None:
         folder = Path(f"results/{subfolder}/")
+
     metric = "Accuracy"
     results = []
 
@@ -144,6 +145,20 @@ def calculate_means(filename = "means.csv", subfolder = None):
 
     summary = pd.DataFrame(results)
 
+    # Sortowanie malejąco według średniej
+    summary = summary.sort_values(
+        by="Mean",
+        ascending=False
+    ).reset_index(drop=True)
+
+    # Wyświetlenie posortowanych wyników
+    print(f"\n--- SORTED MEAN ACCURACY FOR {subfolder} ---")
+    print(summary.to_string(
+        index=False,
+        formatters={"Mean": lambda x: f"{x:.4f} ({x:.2%})"}
+    ))
+
+    # Wykres
     plt.figure(figsize=(12, 7))
 
     bars = plt.barh(
@@ -165,14 +180,15 @@ def calculate_means(filename = "means.csv", subfolder = None):
 
     plt.grid(axis="x", alpha=0.2)
     plt.tight_layout()
-    plt.savefig(f"{folder}/{filename}", dpi=300)
-    print(f"{folder}/{filename}")
+    plt.savefig(folder / filename, dpi=300)
     plt.show()
+
+    return summary
 
 
 
 if __name__ == "__main__":
-    test = True
+    test = False
     if test:
         verbose = False
         easy_four_1 = {
@@ -283,9 +299,10 @@ if __name__ == "__main__":
             print(f"\n--- AVERAGE METRICS OVER ALL SEEDS FOR {test_object["dataset_name"]}, ELAPSED TIME {end_time:.2f} s, FEATURES {test_object["target_features"]} ---")
             print(results)
     else:
-        mode = "easy_three"
-        mean_filename = "means.png"
+        modes = ["easy_three", "easy_four", "medium_three", "medium_four", "complex_three", "complex_four"]
+        for mode in modes:
+            mean_filename = f"{mode}_means.png"
 
-        calculate_means(mean_filename, mode)
+            calculate_means(mean_filename, mode)
         # create_latex_table(results, output_file='results/classical_baselines_results_avg_3vs4_5_features.tex')
 

@@ -21,8 +21,8 @@ from src.utils import load_dataset
 
 def train(
     dataset_name: str = "iris",
-    target_classes: list = ["0", "1"],
-    target_features: list =  [0, 1, 2, 3], # [1, 2, 3, 4],
+    target_classes: list = ["0", "1", "2"],
+    target_features: list =  [0, 1, 2], # [1, 2, 3, 4],
     feature_map_type: str = "zzfeaturemap",
     ansatz_type: str = "realamplitudes",
     reps: int = 2,
@@ -89,6 +89,7 @@ def train(
         ansatz,
         X_val,
         best_w,
+        num_classes=len(target_classes),
         backend=backend_obj,
         backend_mode=backend_mode,
         shots=shots,
@@ -131,6 +132,7 @@ def train(
 
 def benchmark(
     datasets: list = ["cornus4f"],
+    target_features: list =  [0, 1, 2, 3],
     backend_types: list = ["sampler", "FakeOdra", "FakeGarnet"],
     ansatze: list = ["spider", "realamplitudes"],
     layers_list: list = [1, 2],
@@ -171,6 +173,7 @@ def benchmark(
 
         res = train(
             dataset_name=ds,
+            target_features=target_features,
             backend_type=b_type,
             ansatz_type=ans,
             reps=l,
@@ -204,13 +207,14 @@ def benchmark(
 
 if __name__ == "__main__":
     df_report = benchmark(
-        datasets=["iris"],
+        datasets=["easy_synthetic"],
+        target_features =  [0, 3, 4],
         backend_types=["FakeOdra"],
         ansatze=["realamplitudes"],
-        layers_list=[2],
+        layers_list=[10],
         optimizers=["adam"],
-        seeds=[42],
+        seeds=[10, 25, 42, 55, 73],
         max_iters=10,
         batch_size=8,
-        out_dir = "out_test"
+        out_dir = "out_synthetic"
     )

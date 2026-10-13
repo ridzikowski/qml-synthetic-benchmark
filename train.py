@@ -21,7 +21,7 @@ from src.utils import load_dataset
 
 def train(
     dataset_name: str = "iris",
-    target_classes: list = ["0", "1", "2"],
+    target_classes: list = ["0", "1"],
     target_features: list =  [0, 1, 2], # [1, 2, 3, 4],
     feature_map_type: str = "zzfeaturemap",
     ansatz_type: str = "realamplitudes",
@@ -198,23 +198,23 @@ def benchmark(
         )
         run_idx += 1
 
-    # df = pd.DataFrame(results)
-    # csv_path = os.path.join(out_dir, "benchmark_backends_results.csv")
-    # df.to_csv(csv_path, index=False)
+    df = pd.DataFrame(results)
+    csv_path = os.path.join(out_dir, "benchmark_backends_results.csv")
+    df.to_csv(csv_path, index=False)
     print(f"✅ BENCHMARK ZAKOŃCZONY! Raport zapisano w: {csv_path}\n")
     return pd.DataFrame(results)
 
 
 if __name__ == "__main__":
     df_report = benchmark(
-        datasets=["easy_synthetic"],
-        target_features =  [0, 3, 4],
+        datasets=["easy3_synthetic"],
+        target_features =  [0, 1, 2],
         backend_types=["FakeOdra"],
         ansatze=["realamplitudes"],
         layers_list=[10],
         optimizers=["adam"],
-        seeds=[10, 25, 42, 55, 73],
-        max_iters=10,
+        seeds=[10, 42],
+        max_iters=250,
         batch_size=8,
-        out_dir = "out_synthetic"
+        out_dir = "out_synthetic_easy3f"
     )

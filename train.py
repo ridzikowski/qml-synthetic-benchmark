@@ -210,10 +210,10 @@ if __name__ == "__main__":
         datasets=["easy3_synthetic"],
         target_features =  [0, 1, 2],
         backend_types=["FakeOdra"],
-        ansatze=["realamplitudes"],
-        layers_list=[10],
+        ansatze=["spider"],
+        layers_list=[i for i in range(5, 16)],
         optimizers=["adam"],
-        seeds=[10, 42],
+        seeds=[42, 89, 123, 456, 768],
         max_iters=250,
         batch_size=8,
         out_dir = "out_synthetic_easy3f"

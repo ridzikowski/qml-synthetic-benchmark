@@ -1,5 +1,6 @@
 import itertools
 import os
+import argparse
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 import time
@@ -141,6 +142,7 @@ def benchmark(
     out_dir: str = "out",
     max_iters: int = 40,
     batch_size: int = 8,
+    target_idx: Optional[int] = None
 ):
     results = []
     total_runs = (
@@ -160,12 +162,13 @@ def benchmark(
     csv_path = os.path.join(out_dir, "benchmark_backends_results.csv")
 
     # Usuwamy poprzedni plik wyników (jeśli istnieje), aby nie mieszać starych danych
-    if os.path.exists(csv_path):
+    if target_idx is None and os.path.exists(csv_path):
         os.remove(csv_path)
-    run_idx = 1
-    for ds, b_type, ans, l, opt, sd in itertools.product(
-        datasets, backend_types, ansatze, layers_list, optimizers, seeds
-    ):
+    all_configs = list(itertools.product(datasets, backend_types, ansatze, layers_list, optimizers, seeds))
+    configs = [all_configs[target_idx]] if target_idx is not None else all_configs
+
+    for ds, b_type, ans, l, opt, sd in configs:
+        run_idx = target_idx + 1 if target_idx is not None else len(results) + 1
         print(
             f"--- Run [{run_idx}/{total_runs}]: DS={ds} | Backend={b_type} |"
             f" Ansatz={ans} | L={l} | Opt={opt} | Seed={sd} ---"
@@ -206,6 +209,11 @@ def benchmark(
 
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run", type=int, default=None, help="Numer uruchomienia (np. 1 dla pierwszej konfiguracji)")
+    args = parser.parse_args()
+
     df_report = benchmark(
         datasets=["easy3_synthetic"],
         target_features =  [0, 1, 2],
@@ -216,5 +224,6 @@ if __name__ == "__main__":
         seeds=[42, 89, 123, 456, 768],
         max_iters=250,
         batch_size=8,
-        out_dir = "out_synthetic_easy3f"
+        out_dir = "out_synthetic_easy3f",
+        target_idx=args.run - 1 if args.run is not None else None
     )

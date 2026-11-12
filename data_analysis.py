@@ -39,67 +39,67 @@ def run_analysis_and_visualization(
 
     unique_classes = np.unique(y)
 
-    # 2. Compute Mean and Standard Deviation per class
-    print("\n--- FEATURE DESCRIPTIVE STATISTICS ---")
-    for cls in unique_classes:
-        filtered_data = df[df["label"] == cls]
-        print(f"\nClass / Label: {cls}")
-        for feature in feature_names:
-            mean = filtered_data[feature].mean()
-            std_dev = filtered_data[feature].std()
-            print(
-                f"  Feature '{feature}': Mean = {mean:.4f}, Std Dev = {std_dev:.4f}"
-            )
+    # # 2. Compute Mean and Standard Deviation per class
+    # print("\n--- FEATURE DESCRIPTIVE STATISTICS ---")
+    # for cls in unique_classes:
+    #     filtered_data = df[df["label"] == cls]
+    #     print(f"\nClass / Label: {cls}")
+    #     for feature in feature_names:
+    #         mean = filtered_data[feature].mean()
+    #         std_dev = filtered_data[feature].std()
+    #         print(
+    #             f"  Feature '{feature}': Mean = {mean:.4f}, Std Dev = {std_dev:.4f}"
+    #         )
 
-    # 3. Shapiro-Wilk Test for Normality
-    print("\n--- SHAPIRO-WILK TEST ---")
-    for cls in unique_classes:
-        filtered_data = df[df["label"] == cls]
-        print(f"\nClass / Label: {cls}")
-        for feature in feature_names:
-            data_to_test = filtered_data[feature].dropna()
-            if len(data_to_test) >= 3:
-                stat, p_val = stats.shapiro(data_to_test)
-                print(f"  {feature}: stat={stat:.4f}, p-value={p_val:.4e}")
-            else:
-                print(
-                    f"  {feature}: Not enough samples (n < 3) for Shapiro test"
-                )
+    # # 3. Shapiro-Wilk Test for Normality
+    # print("\n--- SHAPIRO-WILK TEST ---")
+    # for cls in unique_classes:
+    #     filtered_data = df[df["label"] == cls]
+    #     print(f"\nClass / Label: {cls}")
+    #     for feature in feature_names:
+    #         data_to_test = filtered_data[feature].dropna()
+    #         if len(data_to_test) >= 3:
+    #             stat, p_val = stats.shapiro(data_to_test)
+    #             print(f"  {feature}: stat={stat:.4f}, p-value={p_val:.4e}")
+    #         else:
+    #             print(
+    #                 f"  {feature}: Not enough samples (n < 3) for Shapiro test"
+    #             )
 
-    # 4. One-Way ANOVA
-    print("\n--- ONE-WAY ANOVA ---")
-    for feature in feature_names:
-        groups = [
-            df[df["label"] == cls][feature].dropna() for cls in unique_classes
-        ]
-        if len(groups) > 1 and all(len(g) > 0 for g in groups):
-            stat, p_val = stats.f_oneway(*groups)
-            print(f"{feature}: F-stat = {stat:.4f}, p-value = {p_val:.4e}")
-        else:
-            print(f"{feature}: Insufficient class variation for ANOVA")
+    # # 4. One-Way ANOVA
+    # print("\n--- ONE-WAY ANOVA ---")
+    # for feature in feature_names:
+    #     groups = [
+    #         df[df["label"] == cls][feature].dropna() for cls in unique_classes
+    #     ]
+    #     if len(groups) > 1 and all(len(g) > 0 for g in groups):
+    #         stat, p_val = stats.f_oneway(*groups)
+    #         print(f"{feature}: F-stat = {stat:.4f}, p-value = {p_val:.4e}")
+    #     else:
+    #         print(f"{feature}: Insufficient class variation for ANOVA")
 
-    # 5. MANOVA
-    print("\n--- MANOVA ---")
-    if len(feature_names) >= 1 and len(unique_classes) > 1:
-        formula = f"{' + '.join(feature_names)} ~ C(label)"
-        try:
-            manova = MANOVA.from_formula(formula, data=df)
-            print(manova.mv_test())
-        except Exception as e:
-            print(f"Error executing MANOVA: {e}")
+    # # 5. MANOVA
+    # print("\n--- MANOVA ---")
+    # if len(feature_names) >= 1 and len(unique_classes) > 1:
+    #     formula = f"{' + '.join(feature_names)} ~ C(label)"
+    #     try:
+    #         manova = MANOVA.from_formula(formula, data=df)
+    #         print(manova.mv_test())
+    #     except Exception as e:
+    #         print(f"Error executing MANOVA: {e}")
 
-    # 6. Feature Correlation Matrix
-    plt.figure(figsize=(8, 6))
-    corr_matrix = df[feature_names].corr()
-    sns.heatmap(
-        corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", vmin=-1, vmax=1
-    )
-    plt.title(f"Feature Correlation Matrix - {dataset_name}")
-    plt.tight_layout()
-    corr_filename = f"correlation_matrix_{dataset_name}.png"
-    plt.savefig(corr_filename, dpi=300)
-    plt.close()
-    print(f"\nSaved plot: {corr_filename}")
+    # # 6. Feature Correlation Matrix
+    # plt.figure(figsize=(8, 6))
+    # corr_matrix = df[feature_names].corr()
+    # sns.heatmap(
+    #     corr_matrix, annot=True, cmap="coolwarm", fmt=".2f", vmin=-1, vmax=1
+    # )
+    # plt.title(f"Feature Correlation Matrix - {dataset_name}")
+    # plt.tight_layout()
+    # corr_filename = f"correlation_matrix_{dataset_name}.png"
+    # plt.savefig(corr_filename, dpi=300)
+    # plt.close()
+    # print(f"\nSaved plot: {corr_filename}")
 
     # 7. Decision Boundaries (SVM on 2D PCA projection)
     if X.shape[1] >= 2:
@@ -147,32 +147,32 @@ def run_analysis_and_visualization(
             s=50,
         )
 
-        handles = [
-            plt.Line2D(
-                [0],
-                [0],
-                marker="o",
-                color="w",
-                markerfacecolor=color_palette[i],
-                markersize=10,
-                markeredgecolor="k",
-            )
-            for i in range(n_classes)
-        ]
-        plt.legend(
-            handles,
-            [f"Class {c}" for c in unique_classes],
-            title="Classes",
-            loc="best",
-        )
+        # handles = [
+        #     plt.Line2D(
+        #         [0],
+        #         [0],
+        #         marker="o",
+        #         color="w",
+        #         markerfacecolor=color_palette[i],
+        #         markersize=10,
+        #         markeredgecolor="k",
+        #     )
+        #     for i in range(n_classes)
+        # ]
+        # plt.legend(
+        #     handles,
+        #     [f"Class {c}" for c in unique_classes],
+        #     title="Classes",
+        #     loc="best",
+        # )
 
-        plt.xlabel("Principal Component 1")
-        plt.ylabel("Principal Component 2")
-        plt.title(
-            f"Decision Boundaries (SVM on 2D PCA) - {dataset_name}"
-        )
+        # plt.xlabel("Principal Component 1")
+        # plt.ylabel("Principal Component 2")
+        # plt.title(
+        #     f"Decision Boundaries (SVM on 2D PCA) - {dataset_name}"
+        # )
         plt.tight_layout()
-        boundary_filename = f"decision_boundaries_{dataset_name}.png"
+        boundary_filename = f"results/decision_boundaries/decision_boundaries_{dataset_name}.png"
         plt.savefig(boundary_filename, dpi=300)
         plt.close()
         print(f"Saved plot: {boundary_filename}")
@@ -187,8 +187,41 @@ if __name__ == "__main__":
     # )
 
     # Test 2: Synthetic Dataset generated on-the-fly
-    run_analysis_and_visualization(
-        dataset_name="1_complex_synthetic",
-        target_features=[0, 1, 2, 3, 4],
-        target_classes=["0", "1", "2", "3", "4"]
-    )
+    datasets = [
+        "synthetic_complex_three_features",
+        "synthetic_medium_three_features",
+        "synthetic_easy_three_features",
+        "synthetic_complex_four_features",
+        "synthetic_medium_four_features",
+        "synthetic_easy_four_features",
+        "synthetic_complex_five_features",
+        "synthetic_medium_five_features",
+        "synthetic_easy_five_features",
+    ]
+    for dataset in datasets:
+        if dataset in [
+            "synthetic_complex_three_features",
+            "synthetic_medium_three_features",
+            "synthetic_easy_three_features",
+        ]:
+            target_features = [0, 1, 2]
+        elif dataset in [
+            "synthetic_complex_four_features",
+            "synthetic_medium_four_features",
+            "synthetic_easy_four_features",
+        ]:
+            target_features = [0, 1, 2, 3]
+        elif dataset in [
+            "synthetic_complex_five_features",
+            "synthetic_medium_five_features",
+            "synthetic_easy_five_features",
+        ]:
+            target_features = [0, 1, 2, 3, 4]
+        else:
+            target_features = [0, 1, 2] 
+
+        run_analysis_and_visualization(
+            dataset_name=dataset,
+            target_features=target_features,
+            target_classes=["0", "1", "2", "3", "4"]
+        )

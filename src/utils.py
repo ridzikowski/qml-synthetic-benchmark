@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.datasets import load_iris, make_classification
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import StratifiedKFold
+from pathlib import Path
 
 def make_and_save_synthetic(
     n_samples_per_class: int = 500,
@@ -89,6 +90,8 @@ def load_dataset(
     complexity: str = "medium",  # "easy", "medium", "complex", "very_complex"
     use_projection_matrix: bool = False,  # Applies EPCO-style linear projection
     random_state: int = 42,
+    partition: str | None = None,
+    return_groups: bool = False,
 ):
     name_clean = dataset_name.lower().strip().replace(" ", "_").replace("-", "_")
     target_features_int = [int(f) for f in target_features]
@@ -144,6 +147,37 @@ def load_dataset(
         df = pd.read_csv(file_path, header=1)
         X_raw = df.iloc[:, :-1].values.astype(float)
         y_raw = df.iloc[:, -1].values
+
+    elif (file_path := (
+        Path(__file__).resolve().parents[1]
+        / "datasets"
+        / f"{name_clean.removesuffix('.csv')}.csv"
+    )).is_file():
+
+        df = pd.read_csv(file_path)
+        if name_clean.startswith("speech_ae_") and "partition" in df.columns:
+            df = df[df["partition"] == "fit"].copy()
+
+        if df.empty:
+            raise ValueError(f"Pusty dataset: {file_path}")
+
+        if "target" not in df.columns:
+            raise ValueError(f"Brak kolumny 'target' w {file_path}")
+
+        metadata_cols = {"target", "partition", "speaker_id", "sample_id"}
+        feature_cols = [
+            col for col in df.columns
+            if col not in metadata_cols
+        ]
+
+        if not feature_cols:
+            raise ValueError("Brak kolumn z cechami")
+
+        X_raw = df[feature_cols].to_numpy(dtype=float)
+        y_raw = df["target"].to_numpy()
+
+        if not np.isfinite(X_raw).all():
+            raise ValueError("Dataset zawiera NaN lub Inf")
 
 
     else:

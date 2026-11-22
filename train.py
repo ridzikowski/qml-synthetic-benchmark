@@ -132,6 +132,7 @@ def train(
 
 def benchmark(
     datasets: list = ["cornus4f"],
+    target_classes: list = [0, 1],
     target_features: list =  [0, 1, 2, 3],
     backend_types: list = ["sampler", "FakeOdra", "FakeGarnet"],
     ansatze: list = ["spider", "realamplitudes"],
@@ -173,6 +174,7 @@ def benchmark(
 
         res = train(
             dataset_name=ds,
+            target_classes=target_classes,
             target_features=target_features,
             backend_type=b_type,
             ansatz_type=ans,
@@ -207,14 +209,15 @@ def benchmark(
 
 if __name__ == "__main__":
     df_report = benchmark(
-        datasets=["speech_ae_3f"],
-        target_features =  [0, 1, 2],
-        backend_types=["sampler"],
+        datasets=["speech_ae_5f"],
+        target_classes=['0', '1', '2', '4', '5'],
+        target_features =  [0, 1, 2, 3, 4],
+        backend_types=["sampler", "FakeOdra"],
         ansatze=["spider"],
-        layers_list=[10],
+        layers_list=[5, 6, 7, 8, 9, 10],
         optimizers=["adam"],
         seeds=[42],
-        max_iters=100,
+        max_iters=250,
         batch_size=8,
-        out_dir = "out_speech_ae"
+        out_dir = "out_speech_ae_5cl_5f"
     )
